@@ -8,7 +8,7 @@ class TicTacToe
 	@valid_move = true
 	end
 
-	def grid
+	def grid	#Sets up the grid showing the positions
 		verticle = "||"
 		horizontal = "===||===||==="
 		(1...10).each { |i| 
@@ -20,21 +20,21 @@ class TicTacToe
 		puts ""
 	end
 
-	def new_move(number, mark) # FIXME- check if there is no more moves and return false to end the game in a draw
-		validate_move(number)
-		draw(number, mark) if @valid_move == true
+	def new_move(number, mark) 
+		validate_move(number)	#Validates whether the move is possible or not
+		draw(number, mark) if @valid_move == true # if it is possible it marks its on the grid
 	end
-#TODO: MAKE all the methods private, and see what is absolutely necesary to make public.
+
 protected
 
 	def draw(number, mark)
-		@positions[number - 1] = mark
-		grid
-		winner
+		@positions[number - 1] = mark #replaces the number with the player's mark so it displays on the grid
+		grid #displays the updated grid to the user
+		winner # checks if there is a winner yet
 	end
 
 	def validate_move(number)
-		if @positions[number - 1].is_a?(Integer) && number.between?(1, 9)
+		if @positions[number - 1].is_a?(Integer) && number.between?(1, 9) #It is a valid move only if the number the user selected is between 1 and 9, ALSO checks if is not taken already.
 			@valid_move = true
 		else
 			@valid_move = false
@@ -42,8 +42,7 @@ protected
 	end
 
 private
-	def winner
-
+	def winner #Based on all the winning lines, checks if the same mark is printed in all 3 of the winning positions
 		(0...winning_positions.size).each { |i|
 			combo = winning_positions[i]
 			if @positions.values_at(*combo) == ['x', 'x', 'x'] || @positions.values_at(*combo) == ['o', 'o', 'o'] #Check if the values in one of the winning positions match 'o' or 'x'
@@ -62,13 +61,13 @@ private
 		def initialize(sign)
 			@sign = sign
 			@name = "The Computer"
-			@computer_move = nil
-			@moves_already_selected = []
-			@collect_index = []
-			@collect_enemy_index = []
+			@computer_move = nil #returns this value to be placed in the grid
+			@moves_already_selected = [] #all the moves that are already occupied.
+			@collect_index = [] #All the moves made by the AI
+			@collect_enemy_index = [] # All the moves made by the player
 		end
 
-		def smart_move(positions)
+		def smart_move(positions) #Method in charge of the moves, if is the first move sends to first_move method.
 			if @computer_move == nil
 				first_move(positions)
 			else
@@ -78,7 +77,7 @@ private
 
 		protected
 
-		def first_move(positions)
+		def first_move(positions) #first move will always be the middle one unless is taken
 			human_move = 0
 			positions.each { |x| human_move = positions.index(x) if x.is_a? String }
 			@collect_enemy_index << human_move
@@ -95,23 +94,23 @@ private
 			end
 		end
 
-		def make_a_move(positions)
+		def make_a_move(positions) #itirates through each posibility and checks if the player1 marked 2 of them, AI then takes the third to avoid loosing.
 			move_tracker(positions)
 			made_move = false
 			
 			last_chance = 0
-			win_win = [[0,1,2], [0,3,6], [0,4,8], [6,7,8], [2,5,8], [1,4,7], [3,4,5], [2,4,6]]
+			win_win = [[0,1,2], [0,3,6], [0,4,8], [6,7,8], [2,5,8], [1,4,7], [3,4,5], [2,4,6]] #All winning possibilities
 			(0...win_win.size).each { |x| 
 				checker = 0
 				(0...win_win[x].size).each { |n|  
 					if @collect_enemy_index.include?(win_win[x][n])
 						checker += 1
 					else
-						last_chance = win_win[x][n] + 1
+						last_chance = win_win[x][n] + 1 # keeps track on the last winning index so it can mark it to avoid loosing.
 						checker -= 1 if @collect_index.include?(win_win[x][n])
 					end }
 
-				if checker == 2
+				if checker == 2 #checks if 2 of 3 winning moves are taken and takes the 3rd.
 					@computer_move = last_chance
 					@collect_index << last_chance - 1
 					made_move = true
@@ -124,7 +123,7 @@ private
 
 		end
 
-		def move_tracker(positions)
+		def move_tracker(positions) #Records everything that is going on, all the player1 move, all the AI move and both together
 			(0...positions.size).each { |x| 
 				if positions[x].is_a?(String)
 					@collect_enemy_index << x unless @collect_enemy_index.include?(x) || positions[x] == @sign
@@ -134,10 +133,11 @@ private
 		end
 
 		private
-		def random_move
+
+		def random_move #random move in the case of no threats
 			begin
 				@computer_move = rand(1..9)
-				end while @moves_already_selected.include?(@computer_move)
+			end while @moves_already_selected.include?(@computer_move)
 				@moves_already_selected << @computer_move
 		end
 	end
