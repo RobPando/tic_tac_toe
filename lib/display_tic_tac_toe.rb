@@ -1,6 +1,11 @@
 # tic_tac_toe.rb
 require_relative 'tic_tac_toe'
 
+class TicTacToeGame 
+	def initialize
+	end
+end
+
 print "Welcome, lets play Tic Tac Toe? yes/no: "
 play_game = gets.downcase.strip
 exit unless play_game == 'yes' || play_game == 'y'
